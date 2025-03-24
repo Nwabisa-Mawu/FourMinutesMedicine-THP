@@ -9,7 +9,7 @@ import { AccountCircle, Menu as MenuIcon, Login, PersonAdd, Edit, Logout, Add as
 import "./css/Header.component.css";
 
 const HeaderComponent = () => {
-  const { user } = useAuthContext();
+  const { user, setUser } = useAuthContext();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -23,6 +23,8 @@ const HeaderComponent = () => {
     handleUserMenuClose();
     removeToken();
     localStorage.clear();
+    //trigger a re-render in the header
+    setUser(null); 
     navigate("/login", { replace: true });
   };
 
@@ -32,6 +34,10 @@ const HeaderComponent = () => {
 
   const goToAddCourse = () => {
     navigate("/add-course", { replace: true })
+  };
+
+  const goToEditUser = () => {
+    navigate("/edit-user", { replace: true })
   }
      
   const handleUserMenu = (event) => {
@@ -163,9 +169,7 @@ const HeaderComponent = () => {
               open={isUserMenuOpen}
               onClose={handleUserMenuClose}
             >
-              <MenuItem onClick={handleUserMenuClose}>
-              <Link to={'./edit-profile'}>
-              </Link>
+              <MenuItem onClick={goToEditUser}>
                 <ListItemIcon>
                   <Edit fontSize="small" />
                 </ListItemIcon>

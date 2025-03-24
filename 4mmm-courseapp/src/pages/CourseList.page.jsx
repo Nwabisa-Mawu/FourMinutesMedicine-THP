@@ -28,6 +28,7 @@ const CourseList = () => {
         const data = await response.json();
         //why +1 on db-course id??
         setCourses(data.data);
+        localStorage.setItem("courses", JSON.stringify(data.data));
         console.log(data);
       } catch (error) {
         console.error("Error fetching courses:", error);

@@ -7,6 +7,7 @@ import SignUp from "./pages/SignUp.page";
 import CourseList from "./pages/CourseList.page";
 import CreateEditCoursePage from "./pages/CreateeditCourse.page";
 import EditCoursePage from "./pages/EditCourse.page";
+import EditUserPage from "./pages/EditUser.page";
 
 const AppRoutes = () => {
     const { user } = useAuthContext();
@@ -28,6 +29,10 @@ const AppRoutes = () => {
         <Route
         path="/edit-course/:documentId"
         element={user ? <EditCoursePage /> : <Navigate to="/login" />}
+        />
+        <Route
+        path="/edit-user"
+        element={user ? <EditUserPage /> : <Navigate to="/login" />}
         />
     </Routes>
     );

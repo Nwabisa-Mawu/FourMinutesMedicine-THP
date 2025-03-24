@@ -20,33 +20,39 @@ const EditCoursePage = () => {
   //get id from url query params
   const { documentId } = useParams();
   const url = `${API}/api/courses?filters[user_code][documentId][$eq]=${user.documentId}&filters[documentId][$eq]=${documentId}`;
+  //get from local
+  const coursesList = localStorage.getItem("courses");
 
   //fetch course data
     useEffect(() => {
     const fetchCourse = async () => {
       setLoading(true);
       try {
-        const response = await fetch(url, {
+         let courseData;
+        if (coursesList && coursesList.length) {
+          courseData = JSON.parse(coursesList).find((course) => course.documentId === documentId);
+        } else {
+          const response = await fetch(url, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${getToken()}`,
           },
-        });
-        
-        const data = await response.json();
-        
-        if (data?.error) {
-          throw new Error(data?.error?.message || "Failed to fetch course");
+          });
+          
+          const data = await response.json();
+          
+          if (data?.error) {
+            throw new Error(data?.error?.message || "Failed to fetch course");
+          }
+          courseData = data.data[0];
         }
         
-        // Extract the attributes and set the form state
-        const courseData = data.data[0];
         setForm({
-          coursename: courseData.coursename || "",
-          course_description: courseData.course_description || "",
-          course_price: courseData.course_price || "",
-          course_image: courseData.course_image?.data?.id || "",
+          coursename: courseData?.coursename || "",
+          course_description: courseData?.course_description || "",
+          course_price: courseData?.course_price || "",
+          course_image: courseData?.course_image?.data?.id || "",
         });
         } catch (err) {
             setError(err.message);

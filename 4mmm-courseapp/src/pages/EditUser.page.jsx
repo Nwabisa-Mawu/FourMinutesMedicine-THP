@@ -1,13 +1,12 @@
 import React from "react";
 import { useState } from "react";
-import { CircularProgress } from "@mui/material";
-import { useAuthContext } from "../context/AuthContext.service";
+import { useNavigate } from "react-router";
+import { useAuthContext } from "../utils/context/AuthContext.service";
 import { API } from "../utils/constants";
 import { getToken } from "../utils/helpers";
-
 import EditComponent from "../components/EditDetail.component";
 
-const EditUserDialog = () => {
+const EditUserPage = () => {
     const { user, setUser } = useAuthContext();
   const [form, setForm] = useState({
     username: user?.username || "",
@@ -16,6 +15,7 @@ const EditUserDialog = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,7 +26,7 @@ const EditUserDialog = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch(`${API}/users/${user.id}`, {
+      const response = await fetch(`${API}/api/users/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -39,6 +39,7 @@ const EditUserDialog = () => {
         throw new Error(data?.error?.message || "Update failed");
       }
       setUser(data);
+      navigate("/dashboard", { replace: true })
     } catch (err) {
       setError(err.message);
     } finally {
@@ -47,7 +48,6 @@ const EditUserDialog = () => {
   };
 
     const userEditFields = {
-        //TODO: make dynamic
         editTypeName: "Edit User",
         editFieldsArr: [
             { label: "Username", name: "username" },
@@ -56,10 +56,9 @@ const EditUserDialog = () => {
         ],
         hasImgUpload: true,
         imageData: { imgName: "User Image", name: "userImg" },
-        //TODO: add fnc for cancelling edit
         modalCtrlBtnsArr: [
             { label: "Update", color: "primary", isSubmit: true },
-            { label: "Cancel", color: "error", isSubmit: false},
+            { label: "Cancel", color: "error", isSubmit: false, onClick: () => navigate("/dashboard", { replace: true }) },
         ],
     };
 
@@ -72,8 +71,10 @@ const EditUserDialog = () => {
             modalCtrlBtnsArr={userEditFields.modalCtrlBtnsArr}
             handleSubmit={handleSubmit}
             handleChange={handleChange}
+            form={form}
+            error={error}
             />
     )
 }
 
-export default EditUserDialog;
+export default EditUserPage;

@@ -55,7 +55,7 @@ const Login = () => {
       { label: "Password", name: "password", type: "password" },
     ],
     submitBtn: { name: "Login" },
-    altLink: { text: "Forgot Password?", linkName: "Reset Password", pathName: "/reset-password" },
+    altLink: { text: "Don't have an account?", linkName: "Sign Up", pathName: "/signup" },
   }
 
   return (

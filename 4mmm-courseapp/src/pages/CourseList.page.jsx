@@ -40,9 +40,9 @@ const CourseList = () => {
     navigate("/add-course", { replace: true })
   }
 
-  const deleteFnc = async (id) => {
+  const deleteFnc = async (documentId) => {
     try {
-      const response = await fetch(`${API}/api/courses/${id}`, {
+      const response = await fetch(`${API}/api/courses/${documentId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +58,7 @@ const CourseList = () => {
       }
       
       // Update the state regardless of response data
-      const newCourses = courses.filter((course) => course.id !== id);
+      const newCourses = courses.filter((course) => course.documentId !== documentId);
       setCourses(newCourses);
       return true;
       } else {
@@ -71,8 +71,8 @@ const CourseList = () => {
     }
   }
 
-  const goToEditFnc = (coursename) => {
-    navigate(`/edit-course/${coursename}`, { replace: true })
+  const goToEditFnc = (documentId) => {
+    navigate(`/edit-course/${documentId}`, { replace: true })
   }
 
   return (
@@ -82,7 +82,7 @@ const CourseList = () => {
       {courses.map((course) => (
         <CourseCard key={course.id} imgUrl={course.course_image} 
           altTxt="Hello" courseName={course.coursename} courseDesc={course.course_description}
-          coursePrice={course.course_price} deleteFnc={() => deleteFnc(parseInt(course.id)-1)}  editFnc={() => goToEditFnc(course.coursename)} />
+          coursePrice={course.course_price} deleteFnc={() => deleteFnc(course.documentId)}  editFnc={() => goToEditFnc(course.documentId)} />
       ))}
     </Box>
    : <div className="call-to-action">

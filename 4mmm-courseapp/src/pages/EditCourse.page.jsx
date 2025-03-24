@@ -18,8 +18,8 @@ const EditCoursePage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   //get id from url query params
-  const { coursename } = useParams();
-  const url = `${API}/api/courses?filters[user_code][id][$eq]=${user.id}&filters[coursename][$eq]=${coursename}`;
+  const { documentId } = useParams();
+  const url = `${API}/api/courses?filters[user_code][documentId][$eq]=${user.documentId}&filters[documentId][$eq]=${documentId}`;
 
   //fetch course data
     useEffect(() => {
@@ -42,7 +42,6 @@ const EditCoursePage = () => {
         
         // Extract the attributes and set the form state
         const courseData = data.data[0];
-        localStorage.setItem("courseID", parseInt(courseData.id)-1);
         setForm({
           coursename: courseData.coursename || "",
           course_description: courseData.course_description || "",
@@ -56,10 +55,10 @@ const EditCoursePage = () => {
             setLoading(false);
         }
         };
-        if (coursename) {
+        if (documentId) {
         fetchCourse();
         }
-    }, [coursename]);
+    }, [documentId]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -69,9 +68,8 @@ const EditCoursePage = () => {
     event.preventDefault();
     setLoading(true);
     setError("");
-    const id = localStorage.getItem("courseID");
     try {
-      const response = await fetch(`${API}/api/courses/${id}`, {
+      const response = await fetch(`${API}/api/courses/${documentId}`, {
         method: "PUT", 
         headers: {
           "Content-Type": "application/json",

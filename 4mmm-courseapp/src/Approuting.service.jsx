@@ -26,7 +26,7 @@ const AppRoutes = () => {
         element={user ? <CreateEditCoursePage /> : <Navigate to="/login" />}
         />
         <Route
-        path="/edit-course/:coursename"
+        path="/edit-course/:documentId"
         element={user ? <EditCoursePage /> : <Navigate to="/login" />}
         />
     </Routes>

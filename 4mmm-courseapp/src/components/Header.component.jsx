@@ -1,22 +1,39 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useAuthContext } from '../utils/context/AuthContext.service';
+import { removeToken } from '../utils/helpers';
 import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Box,
-  useMediaQuery, useTheme, Drawer, List, ListItem, ListItemText, ListItemIcon, Divider
+  useMediaQuery, useTheme, Drawer, Link, List, ListItem, ListItemText, ListItemIcon, Divider
 } from '@mui/material';
-import { AccountCircle, Menu as MenuIcon, Login, PersonAdd, Edit, Logout } from '@mui/icons-material';
+import { AccountCircle, Menu as MenuIcon, Login, PersonAdd, Edit, Logout, Add as AddIcon } from '@mui/icons-material';
 import "./css/Header.component.css";
 
 const HeaderComponent = () => {
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isLoggedIn = false;
-  
   // User menu state
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
   const isUserMenuOpen = Boolean(userMenuAnchorEl);
-  
-  // Mobile drawer state
+  // drawer state
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
+  const handleLogout = () => {
+    handleUserMenuClose();
+    removeToken();
+    localStorage.clear();
+    navigate("/login", { replace: true });
+  };
+
+  const goToSignUp = () => {
+    navigate("/signup", { replace: true});
+  }
+
+  const goToAddCourse = () => {
+    navigate("/add-course", { replace: true })
+  }
+     
   const handleUserMenu = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
@@ -97,16 +114,30 @@ const HeaderComponent = () => {
             {/* <Button color="inherit" sx={{ mr: 1 }} startIcon={<Login />}>
               Login
             </Button> */}
-            <Button 
+            { !user ? <Button 
               variant="contained" 
               color="secondary" 
               sx={{ mr: 2 }}
-              startIcon={<PersonAdd />}
+              startIcon={<PersonAdd
+              />}
+              onClick={goToSignUp}
             >
               Sign Up
-            </Button>
+            </Button> : <p></p>}
+
+            { user ?
+            <IconButton
+              size="large"
+              onClick={goToAddCourse}
+              color="inherit"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+            >
+            <AddIcon />
+            </IconButton> : <p></p>}
             
-            { isLoggedIn ?
+            { user ?
             <IconButton
               size="large"
               onClick={handleUserMenu}
@@ -133,12 +164,14 @@ const HeaderComponent = () => {
               onClose={handleUserMenuClose}
             >
               <MenuItem onClick={handleUserMenuClose}>
+              <Link to={'./edit-profile'}>
+              </Link>
                 <ListItemIcon>
                   <Edit fontSize="small" />
                 </ListItemIcon>
                 <ListItemText>Edit Profile</ListItemText>
               </MenuItem>
-              <MenuItem onClick={handleUserMenuClose}>
+              <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>

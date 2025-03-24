@@ -1,8 +1,9 @@
 import React from "react";
-import { Card, CardContent, Typography, TextField, Button, Box } from "@mui/material";
+import { Card, CardContent, Typography, TextField, Button, Box, Alert } from "@mui/material";
 
-const EditModal = (props) => {
-    const { editTypeName, editFieldsArr,  hasImgUpload, imageData, modalCtrlBtnsArr, handleSubmit, } = props;
+const EditComponent = (props) => {
+    const { editTypeName, editFieldsArr,  hasImgUpload, imageData, 
+      modalCtrlBtnsArr, handleSubmit, handleChange, error, form } = props;
 
     return (
         <>
@@ -12,8 +13,8 @@ const EditModal = (props) => {
                     <Typography variant="h5" gutterBottom>
                      {editTypeName}
                     </Typography>
-                    {/* {error && <Alert severity="error">{error}</Alert>} */}
-                    <form>
+                    {error && <Alert severity="error">{error}</Alert>}
+                    <form onSubmit={handleSubmit}>
                         {(editFieldsArr && editFieldsArr.length) ? editFieldsArr.map((field, key) => {
                             return (
                                 <TextField
@@ -24,8 +25,8 @@ const EditModal = (props) => {
                                     margin="normal"
                                     required
                                     row={field.row ? field.row : 1}
-                                //   value={form.coursename}
-                                //   onChange={handleChange}
+                                  value={form[field.name] ? form[field.name]:""}
+                                  onChange={handleChange}
                                 />
                             )
                         }) : null}
@@ -37,9 +38,9 @@ const EditModal = (props) => {
                         </Typography>
                          <input
                         type="file"
-                        // name={props.imageData.name}
+                        name={imageData.name}
                         accept="image/*"
-                        // onChange={handleChange}
+                        onChange={handleChange}
                         style={{ marginTop: "16px" }}
                       />
                       </div>
@@ -47,7 +48,9 @@ const EditModal = (props) => {
 
                       {(modalCtrlBtnsArr && modalCtrlBtnsArr.length) ? modalCtrlBtnsArr.map((btn, key) => {
                             return (
-                                <Button type={btn.isSubmit ? "submit" : "button"} key={key} variant="contained" fullWidth color={btn.color}>
+                                <Button type={btn.isSubmit ? "submit" : "button"} key={key} 
+                                  variant="contained" fullWidth color={btn.color}
+                                  onClick={btn.onClick ? btn.onClick : null}>
                                     {btn.label}
                                 </Button>
                             )
@@ -60,4 +63,4 @@ const EditModal = (props) => {
     );
 };
 
-export default EditModal;
+export default EditComponent;

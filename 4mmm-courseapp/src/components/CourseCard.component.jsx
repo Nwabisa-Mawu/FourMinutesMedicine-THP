@@ -4,7 +4,7 @@ import { Box, Card,CardContent,CardMedia,IconButton, Typography } from '@mui/mat
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 
 const CourseCard = (props) => {
-  const { imgUrl, altTxt, courseName, courseDesc, coursePrice } = props;
+  const { imgUrl, altTxt, courseName, courseDesc, coursePrice, deleteFnc, editFnc } = props;
   const theme = useTheme();
 
   return (
@@ -36,10 +36,10 @@ const CourseCard = (props) => {
           </Typography>
         </CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
-          <IconButton aria-label="previous">
+          <IconButton aria-label="previous" onClick={deleteFnc}>
             {theme.direction === 'rtl' ? <DeleteIcon /> : <DeleteIcon />}
           </IconButton>
-          <IconButton aria-label="next">
+          <IconButton aria-label="next" onClick={editFnc}>
             {theme.direction === 'rtl' ? <EditIcon /> : <EditIcon />}
           </IconButton>
         </Box>

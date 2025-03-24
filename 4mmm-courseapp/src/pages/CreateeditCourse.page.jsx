@@ -41,7 +41,7 @@ const CreateEditCoursePage = () => {
             course_image: form.course_image ? form.course_image : null,
             // location: "en",
             user_code: {
-                  connect: [{ id: user.documentId }]
+                  connect: [{ id: user.id }]
             } 
           }}),
       });

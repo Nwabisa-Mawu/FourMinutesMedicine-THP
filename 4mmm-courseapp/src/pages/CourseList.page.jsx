@@ -28,7 +28,6 @@ const CourseList = () => {
         const data = await response.json();
         setCourses(data.data);
         localStorage.setItem("courses", JSON.stringify(data.data));
-        console.log(data);
       } catch (error) {
         console.error("Error fetching courses:", error);
       }
@@ -81,7 +80,7 @@ const CourseList = () => {
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {courses.map((course) => (
         <CourseCard key={course.id} imgUrl={course.course_image} 
-          altTxt="Hello" courseName={course.coursename} courseDesc={course.course_description}
+          altTxt="Course Image" courseName={course.coursename} courseDesc={course.course_description}
           coursePrice={course.course_price} deleteFnc={() => deleteFnc(course.documentId)}  editFnc={() => goToEditFnc(course.documentId)} />
       ))}
     </Box>

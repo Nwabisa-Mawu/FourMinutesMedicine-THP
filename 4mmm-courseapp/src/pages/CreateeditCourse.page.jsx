@@ -12,45 +12,84 @@ const CreateEditCoursePage = () => {
     coursename: "",
     course_description: "",
     course_price: "",
-    course_image: "",
+    course_image: null, // Store the image file
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // Handle text inputs & file upload
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "course_image") {
+      setForm({ ...form, course_image: e.target.files[0] }); // Store file
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
+  // Upload image function
+  const handleImageUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("files", file);
+
+    try {
+      const response = await fetch(`${API}/api/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return data[0].id; // Return uploaded image ID
+      } else {
+        throw new Error("Image upload failed");
+      }
+    } catch (err) {
+      console.error("Image Upload Error:", err);
+      setError("Failed to upload image");
+      return null;
+    }
+  };
+
+  // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError("");
+
     try {
-      //TODO: needs to fetch one course at a time
+      let uploadedImageId = null;
+      if (form.course_image) {
+        uploadedImageId = await handleImageUpload(form.course_image);
+      }
+
       const response = await fetch(`${API}/api/courses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({data: { 
+        body: JSON.stringify({
+          data: {
             coursename: form.coursename,
             course_description: form.course_description,
             course_price: form.course_price,
-            course_image: form.course_image ? form.course_image : null,
-            // location: "en",
+            course_image: uploadedImageId ? [uploadedImageId] : [], // Attach image ID
             user_code: {
-                  connect: [{ id: user.id }]
-            } 
-          }}),
+              connect: [{ id: user.id }],
+            },
+          },
+        }),
       });
+
       const data = await response.json();
-      if (data?.error) {
-        throw new Error(data?.error?.message || "Update failed");
-      }
-      // setCourses((prevCourses) => [...prevCourses, data.data]);
+      if (data?.error) throw new Error(data?.error?.message || "Failed to create course");
+
       navigate("/dashboard", { replace: true });
+
     } catch (err) {
       setError(err.message);
     } finally {

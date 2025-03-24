@@ -12,101 +12,132 @@ const EditCoursePage = () => {
     coursename: "",
     course_description: "",
     course_price: "",
-    course_image: "",
+    course_image: null, // Store file instead of URL
+    existing_image_id: null, // Store existing image ID
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  //get id from url query params
   const { documentId } = useParams();
-  const url = `${API}/api/courses?filters[user_code][documentId][$eq]=${user.documentId}&filters[documentId][$eq]=${documentId}`;
-  //get from local
-  const coursesList = localStorage.getItem("courses");
 
-  //fetch course data
-    useEffect(() => {
+  const url = `${API}/api/courses/${documentId}?populate=course_image`;
+
+  // Fetch course data
+  useEffect(() => {
     const fetchCourse = async () => {
       setLoading(true);
       try {
-         let courseData;
-        if (coursesList && coursesList.length) {
-          courseData = JSON.parse(coursesList).find((course) => course.documentId === documentId);
-        } else {
-          const response = await fetch(url, {
+        const response = await fetch(url, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${getToken()}`,
           },
-          });
-          
-          const data = await response.json();
-          
-          if (data?.error) {
-            throw new Error(data?.error?.message || "Failed to fetch course");
-          }
-          courseData = data.data[0];
+        });
+
+        const data = await response.json();
+        if (data?.error) {
+          throw new Error(data?.error?.message || "Failed to fetch course");
         }
-        
+
+        const courseData = data.data;
         setForm({
           coursename: courseData?.coursename || "",
           course_description: courseData?.course_description || "",
           course_price: courseData?.course_price || "",
-          course_image: courseData?.course_image?.data?.id || "",
+          course_image: null, 
+          existing_image_id: courseData?.course_image?.id || null, 
         });
-        } catch (err) {
-            setError(err.message);
-            console.error("Error fetching course:", err);
-        } finally {
-            setLoading(false);
-        }
-        };
-        if (documentId) {
-        fetchCourse();
-        }
-    }, [documentId]);
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching course:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (documentId) fetchCourse();
+  }, [documentId]);
+
+  // Handle text inputs & file upload
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "course_image") {
+      setForm({ ...form, course_image: e.target.files[0] });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
+  // Upload image to Strapi
+  const handleImageUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("files", file);
+
+    try {
+      const response = await fetch(`${API}/api/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return data[0].id; // return uploaded image ID
+      } else {
+        throw new Error("Image upload failed");
+      }
+    } catch (err) {
+      console.error("Image Upload Error:", err);
+      setError("Failed to upload image");
+      return null;
+    }
+  };
+
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError("");
+
     try {
+      let uploadedImageId = form.existing_image_id; // Default to existing image
+      if (form.course_image) {
+        uploadedImageId = await handleImageUpload(form.course_image);
+      }
+
       const response = await fetch(`${API}/api/courses/${documentId}`, {
-        method: "PUT", 
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
         body: JSON.stringify({
-          data: { 
+          data: {
             coursename: form.coursename,
             course_description: form.course_description,
             course_price: form.course_price,
-            course_image: form.course_image ? form.course_image : null,
+            course_image: uploadedImageId ? [uploadedImageId] : [], // Attach image ID
             user_code: {
-              connect: [{ id: user.id }]
-            } 
-          }
+              connect: [{ id: user.id }],
+            },
+          },
         }),
       });
-      
+
       const data = await response.json();
-      
-      if (data?.error) {
-        throw new Error(data?.error?.message || "Update failed");
-      }
-      
+      if (data?.error) throw new Error(data?.error?.message || "Update failed");
+
       navigate("/dashboard", { replace: true });
+
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
   const editCourses = {
     editTypeName: "Edit Course",
     editFieldsArr: [

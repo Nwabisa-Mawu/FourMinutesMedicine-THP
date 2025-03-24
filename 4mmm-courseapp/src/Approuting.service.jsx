@@ -14,26 +14,13 @@ const AppRoutes = () => {
 
     return (
     <Routes>
-        <Route path="/"
-         element={ user ?<Navigate to="/dashboard" /> : <Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route
-        path="/dashboard"
-        element={user ? <CourseList /> : <Navigate to="/login" />}
-        />
-        <Route
-        path="/add-course"
-        element={user ? <CreateEditCoursePage /> : <Navigate to="/login" />}
-        />
-        <Route
-        path="/edit-course/:documentId"
-        element={user ? <EditCoursePage /> : <Navigate to="/login" />}
-        />
-        <Route
-        path="/edit-user"
-        element={user ? <EditUserPage /> : <Navigate to="/login" />}
-        />
+      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/dashboard" element={user ? <CourseList /> : <Navigate to="/login" replace />} />
+      <Route path="/add-course" element={user ? <CreateEditCoursePage /> : <Navigate to="/login" replace />} />
+      <Route path="/edit-course/:documentId" element={user ? <EditCoursePage /> : <Navigate to="/login" replace />} />
+      <Route path="/edit-user" element={user ? <EditUserPage /> : <Navigate to="/login" replace />} />
     </Routes>
     );
 };

@@ -26,7 +26,6 @@ const CourseList = () => {
           },
         });
         const data = await response.json();
-        //why +1 on db-course id??
         setCourses(data.data);
         localStorage.setItem("courses", JSON.stringify(data.data));
         console.log(data);
@@ -35,7 +34,7 @@ const CourseList = () => {
       }
     };
     fetchCourses();
-  }, []);
+  }, [user, courses]);
 
   const goToAddCourse = () => {
     navigate("/add-course", { replace: true })

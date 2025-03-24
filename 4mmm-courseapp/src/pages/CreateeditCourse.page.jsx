@@ -7,7 +7,7 @@ import { getToken } from "../utils/helpers";
 import EditComponent from "../components/EditDetail.component";
 
 const CreateEditCoursePage = () => {
-  const { user, setUser } = useAuthContext();
+  const { user } = useAuthContext();
   const [form, setForm] = useState({
     coursename: "",
     course_description: "",
@@ -49,7 +49,7 @@ const CreateEditCoursePage = () => {
       if (data?.error) {
         throw new Error(data?.error?.message || "Update failed");
       }
-      setUser(data);
+      // setCourses((prevCourses) => [...prevCourses, data.data]);
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err.message);
@@ -59,7 +59,7 @@ const CreateEditCoursePage = () => {
   };
 
   const editCourses = {
-    editTypeName: "Edit Course",
+    editTypeName: "Add Course",
     editFieldsArr: [
       { label: "Course Name", name: "coursename" },
       { label: "Course Description", name: "course_description", row: 4 },
